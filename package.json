@@ -1,0 +1,14 @@
+{
+  "name": "@ric/maps",
+  "version": "0.1.0",
+  "description": "Reusable maps and places provider templates for RIC map products.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "license": "MIT"
+}
