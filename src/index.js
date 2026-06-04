@@ -17,6 +17,14 @@ export * from './providers/mapboxRuntime.js';
 export * from './routeLine.js';
 export * from './runtimePolicy.js';
 export * from './startup.js';
+export {
+  TST_PLACE_KEY_CONTRACT,
+  TST_PRESENT,
+  buildTstBaseKey,
+  buildTstGeohash,
+  normalizeTstGeohash,
+  normalizeTstSlug,
+} from './tstBridge.js';
 export * from './visitedCoverage.js';
 
 // Geohash precision metadata (reusable reference data).

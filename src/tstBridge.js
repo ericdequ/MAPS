@@ -13,6 +13,8 @@
 // exists. This is that seam for MAPS→TST.
 // =============================================================================
 
+import { encodeMapsGeohash } from './geohash.js';
+
 // --- optional TST load: package first, then dev sibling, then local ---------
 let tst = null;
 for (const spec of ['@ric/tst', '../../TST/src/index.js']) {
@@ -55,6 +57,48 @@ function localNormalizeProviderId(value = '', fallback = 'unknown') {
 const normKind = (v = '', f = 'adapter') =>
   clean(v, f).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || f;
 const kindEmoji = (v = '', f = 'adapter') => KIND_EMOJI[normKind(v, f)] || KIND_EMOJI[f] || KIND_EMOJI.adapter;
+const GEOHASH_RE = /^[0-9bcdefghjkmnpqrstuvwxyz]{1,12}$/;
+export const TST_PLACE_KEY_CONTRACT = 'name@geohash9[@time][#type]';
+
+function localNormalizeTstSlug(value = '', fallback = 'spot') {
+  return clean(value, fallback)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64) || fallback;
+}
+
+function localNormalizeGeohash(value = '', precision = 9) {
+  const text = clean(value).toLowerCase();
+  if (!GEOHASH_RE.test(text)) return '';
+  return text.slice(0, precision);
+}
+
+function localBuildTstGeohash({
+  lat,
+  lng,
+  geohash,
+  precision = 9,
+} = {}) {
+  return localNormalizeGeohash(geohash, precision) || encodeMapsGeohash(lat, lng, precision);
+}
+
+function localBuildTstBaseKey({
+  name,
+  slug,
+  lat,
+  lng,
+  geohash,
+  precision = 9,
+  fallbackSlug = 'spot',
+  missingGeohash = 'unmapped',
+} = {}) {
+  const keySlug = localNormalizeTstSlug(slug || name, fallbackSlug);
+  const keyGeohash = localBuildTstGeohash({ lat, lng, geohash, precision });
+  return `${keySlug}@${keyGeohash || missingGeohash}`;
+}
 
 function localDefineProviderType(opts = {}) {
   const { id, label, kind = 'adapter', mode = 'optional', defaultMode = mode, requiredEnv = [], optionalEnv = [], publicEnv = [], capabilities = [], durableStorage = 'adapter-local', sourcePolicy = '', attribution = [], styleTemplates = [], searchTemplates = [], startupNotes = [] } = opts;
@@ -99,6 +143,10 @@ function localBuildProviderRef(opts = {}) {
 export const defineProviderType = tst?.defineTstProviderType ?? localDefineProviderType;
 export const buildProviderRef = tst?.buildTstProviderRef ?? localBuildProviderRef;
 export const normalizeProviderId = tst?.normalizeTstProviderId ?? localNormalizeProviderId;
+export const normalizeTstSlug = tst?.normalizeTstSlug ?? localNormalizeTstSlug;
+export const normalizeTstGeohash = tst?.normalizeGeohash ?? localNormalizeGeohash;
+export const buildTstGeohash = tst?.buildTstGeohash ?? localBuildTstGeohash;
+export const buildTstBaseKey = tst?.buildTstBaseKey ?? localBuildTstBaseKey;
 
 // Emoji-type enrichment is TST-owned; standalone MAPS degrades gracefully
 // (no emoji type) rather than carrying TST's full emoji catalog.
@@ -106,4 +154,12 @@ export const resolveEmojiType = tst?.resolveTstEmojiType ?? (() => null);
 export const expandUnicodeTypes = tst?.expandTstUnicodeTypes ?? ((values = []) => list(values));
 
 // Exposed for tests: prove the local fallback emits valid shapes without TST.
-export const __local = { localDefineProviderType, localBuildProviderRef, localNormalizeProviderId };
+export const __local = {
+  localDefineProviderType,
+  localBuildProviderRef,
+  localNormalizeProviderId,
+  localNormalizeTstSlug,
+  localNormalizeGeohash,
+  localBuildTstGeohash,
+  localBuildTstBaseKey,
+};

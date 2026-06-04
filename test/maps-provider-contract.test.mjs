@@ -18,6 +18,7 @@ import {
   buildMapsStartupConfig,
   buildMapsVisitedCandidates,
   buildMapsVisitedSettings,
+  buildTstBaseKey,
   createEnabledProviderAdapters,
   createGoogleMapsAdapter,
   createMapsProviderAdapter,
@@ -63,6 +64,7 @@ import {
   shouldShowRichOverlayPins,
   shouldTrackMapsVisitedGeohash,
   sortMapsPinsForDisplay,
+  TST_PLACE_KEY_CONTRACT,
   validateMapsBlogDataset,
   validateMapsSpecializedLayer,
 } from '../src/index.js';
@@ -133,6 +135,11 @@ test('provider adapter normalizes provider records into MAPS place schema', () =
 });
 
 test('place schema builds stable name@geohash9 keys with fallbacks', () => {
+  assert.equal(TST_PLACE_KEY_CONTRACT, 'name@geohash9[@time][#type]');
+  assert.equal(
+    buildTstBaseKey({ name: 'Cafe Court!', geohash: 'djn4k5e7u999' }),
+    'cafe-court@djn4k5e7u'
+  );
   assert.equal(
     buildMapsPlaceKey({ name: 'Cafe Court!', geohash: 'djn4k5e7u999' }),
     'cafe-court@djn4k5e7u'

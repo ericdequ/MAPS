@@ -1,15 +1,17 @@
-import { encodeMapsGeohash } from './geohash.js';
 import {
   buildProviderRef,
+  buildTstBaseKey,
+  buildTstGeohash,
   expandUnicodeTypes,
+  normalizeTstGeohash,
+  normalizeTstSlug,
   resolveEmojiType,
+  TST_PLACE_KEY_CONTRACT,
 } from './tstBridge.js';
 
 export const MAPS_PLACE_SCHEMA_VERSION = 'maps-place-v1';
 export const MAPS_POI_SOURCE_SCHEMA_VERSION = 'maps-poi-source-v1';
-export const MAPS_TST_CONTRACT = 'name@geohash9[@time][#type]';
-
-const GEOHASH_RE = /^[0-9bcdefghjkmnpqrstuvwxyz]{1,12}$/;
+export const MAPS_TST_CONTRACT = TST_PLACE_KEY_CONTRACT;
 
 const freeze = (value) => Object.freeze(value);
 const cleanText = (value, fallback = '') =>
@@ -18,18 +20,10 @@ const cleanText = (value, fallback = '') =>
     .trim();
 
 export const normalizeMapsSlug = (value, fallback = 'place') =>
-  cleanText(value, fallback)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 72) || fallback;
+  normalizeTstSlug(value, fallback);
 
 export function normalizeMapsGeohash(value = '', precision = 9) {
-  const text = cleanText(value).toLowerCase();
-  if (!GEOHASH_RE.test(text)) return '';
-  return text.slice(0, precision);
+  return normalizeTstGeohash(value, precision);
 }
 
 export function buildMapsPlaceKey({
@@ -39,9 +33,14 @@ export function buildMapsPlaceKey({
   fallbackSlug = 'place',
   missingGeohash = 'unmapped',
 } = {}) {
-  const keySlug = normalizeMapsSlug(slug || name, fallbackSlug);
-  const keyGeohash = normalizeMapsGeohash(geohash, 9) || missingGeohash;
-  return `${keySlug}@${keyGeohash}`;
+  return buildTstBaseKey({
+    name,
+    slug,
+    geohash,
+    precision: 9,
+    fallbackSlug,
+    missingGeohash,
+  });
 }
 
 export const mapsPlaceRequiredFields = freeze([
@@ -67,11 +66,11 @@ export function normalizeMapsPlace(input = {}) {
   const geohash = normalizeMapsGeohash(
     input.geohash || input.geohash9 || input.g9 || input.publicGeohash,
     9
-  ) || encodeMapsGeohash(
-    input.lat ?? input.latitude,
-    input.lng ?? input.lon ?? input.longitude,
-    9
-  );
+  ) || buildTstGeohash({
+    lat: input.lat ?? input.latitude,
+    lng: input.lng ?? input.lon ?? input.longitude,
+    precision: 9,
+  });
   const canonicalKey = buildMapsPlaceKey({
     name,
     slug: input.slug,
