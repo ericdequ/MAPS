@@ -6,6 +6,7 @@ export const libreProviderManifest = getMapsProvider('libre');
 export const libreProviderTemplates = Object.freeze({
   style: Object.freeze({
     maplibreStyleUrlEnv: 'NEXT_PUBLIC_MAPLIBRE_STYLE_URL',
+    maplibreDarkStyleUrlEnv: 'NEXT_PUBLIC_MAPLIBRE_STYLE_DARK_URL',
     pmtilesBaseUrlEnv: 'PMTILES_BASE_URL',
   }),
   places: Object.freeze({

@@ -1,5 +1,6 @@
 export * from './geohash.js';
 export * from './geoViewport.js';
+export * from './blogDatasets.js';
 export * from './mapPin.js';
 export * from './placeSchema.js';
 export * from './providerAdapter.js';

@@ -32,6 +32,8 @@ import {
 
 - `src/providerRegistry.js` - TST-backed provider manifests for Libre, Mapbox,
   Google, and Apple.
+- `src/blogDatasets.js` - Blogs dataset/provider/source catalog, including
+  specialized layers such as Magick's Map of Miracles.
 - `src/placeSchema.js` - normalized provider-neutral place skeleton using
   `name@geohash9`.
 - `src/mapPin.js` - provider-neutral `maps-pin-v1` records for map renderers.
@@ -103,3 +105,22 @@ place/activity glyphs come from the TST emoji type map.
   confirms and normalizes a durable app record.
 - Attribution must render anywhere maps or provider-sourced records are visible.
 - Server-only provider keys must not be exposed through public env variables.
+
+## Blogs Catalog
+
+`src/blogDatasets.js` is the shared contract between the Blogs manager repo and
+MAPS. It lists the eight blog map datasets, their default render provider,
+optional provider chain, upstream POI source manifests, cache mode, attribution,
+and safety notes.
+
+The catalog intentionally separates:
+
+- Render/search providers: `libre`, `mapbox`, `google`, `apple`.
+- Upstream data sources: OpenStreetMap, US Census, iNaturalist, and site-owned
+  markdown fixtures.
+- Portable identity: normalized MAPS places using `name@geohash9`.
+
+Magick's `magick:map-of-miracles` layer is modeled as a specialized layer on top
+of `magick:sacred-geography`. It can use current sacred geography seeds now, but
+markdown stories should only become map records after explicit coordinates or a
+curated place anchor are present.

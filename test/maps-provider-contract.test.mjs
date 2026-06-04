@@ -26,6 +26,8 @@ import {
   evaluateProviderEnv,
   expandMapsBounds,
   formatMapsClusterCount,
+  getMapsBlogDataset,
+  getMapsBlogDatasetsForBlog,
   getAppleClusterGlyph,
   getAppleMapKitTokenStatus,
   getJwtExpiry,
@@ -38,12 +40,18 @@ import {
   isMapsGeohashVisited,
   isMapsLatLngInBounds,
   libreProviderTemplates,
+  listMapsBlogDatasets,
+  listMapsSpecializedLayers,
   mapboxProviderTemplates,
+  MAPS_BLOG_DATASET_SCHEMA_VERSION,
   MAPS_PLACE_SCHEMA_VERSION,
   MAPS_PROVIDER_SCHEMA_VERSION,
+  MAPS_SPECIALIZED_LAYER_SCHEMA_VERSION,
   mapsProviderIds,
   mapsProviderRegistry,
+  mapsSpecializedLayers,
   mergeMapsVisitedGeohashes,
+  normalizeBlogMapPointAsMapsPlace,
   normalizeAppleMapKitSearchPlace,
   normalizeAppleMapsPlace,
   normalizeAppleMapsTokenOrigin,
@@ -55,6 +63,8 @@ import {
   shouldShowRichOverlayPins,
   shouldTrackMapsVisitedGeohash,
   sortMapsPinsForDisplay,
+  validateMapsBlogDataset,
+  validateMapsSpecializedLayer,
 } from '../src/index.js';
 
 test('provider registry covers starter map and places providers', () => {
@@ -139,6 +149,51 @@ test('place schema builds stable name@geohash9 keys with fallbacks', () => {
   );
 });
 
+test('blog map datasets align providers, sources, and specialized miracle layer', () => {
+  const datasets = listMapsBlogDatasets();
+  assert.equal(datasets.length, 8);
+  for (const dataset of datasets) {
+    assert.equal(dataset.schemaVersion, MAPS_BLOG_DATASET_SCHEMA_VERSION);
+    assert.deepEqual(validateMapsBlogDataset(dataset), []);
+    assert.ok(mapsProviderIds.includes(dataset.defaultProviderId));
+    assert.ok(dataset.sourceManifests.length > 0);
+  }
+
+  const magickDataset = getMapsBlogDataset('magick:sacred-geography');
+  assert.equal(magickDataset.blog, 'magick');
+  assert.equal(getMapsBlogDatasetsForBlog('magick')[0].id, 'magick:sacred-geography');
+
+  const miracleLayer = mapsSpecializedLayers['magick:map-of-miracles'];
+  assert.equal(miracleLayer.schemaVersion, MAPS_SPECIALIZED_LAYER_SCHEMA_VERSION);
+  assert.equal(miracleLayer.datasetId, magickDataset.id);
+  assert.equal(miracleLayer.mapIdeaId, 'map-of-miracles');
+  assert.equal(miracleLayer.status, 'seeded');
+  assert.ok(miracleLayer.requiredKeywords.includes('miracle'));
+  assert.deepEqual(validateMapsSpecializedLayer(miracleLayer), []);
+  assert.equal(listMapsSpecializedLayers().length, 1);
+});
+
+test('blog map points normalize into MAPS place identity', () => {
+  const place = normalizeBlogMapPointAsMapsPlace(
+    {
+      id: 'cebreiro-church',
+      title: 'O Cebreiro Church',
+      lat: 42.7076,
+      lng: -7.0431,
+      category: 'worship',
+      tags: ['miracle-candidate'],
+    },
+    { datasetId: 'magick:sacred-geography' }
+  );
+
+  assert.equal(place.schemaVersion, MAPS_PLACE_SCHEMA_VERSION);
+  assert.equal(place.provider, 'libre');
+  assert.equal(place.sourceId, 'magick:sacred-geography:cebreiro-church');
+  assert.match(place.canonicalKey, /^o-cebreiro-church@[0-9bcdefghjkmnpqrstuvwxyz]{9}$/);
+  assert.ok(place.typeTokens.includes('miracle-candidate'));
+  assert.ok(place.links.mapPath);
+});
+
 test('enabled provider adapters expose shared search and runtime template shape', () => {
   const adapters = createEnabledProviderAdapters({
     env: {
@@ -164,6 +219,8 @@ test('enabled provider adapters expose shared search and runtime template shape'
 
 test('per-provider template modules expose startup env and place identity hints', () => {
   assert.equal(libreProviderTemplates.places.normalizedIdentity, 'name@geohash9');
+  assert.equal(libreProviderTemplates.style.maplibreStyleUrlEnv, 'NEXT_PUBLIC_MAPLIBRE_STYLE_URL');
+  assert.equal(libreProviderTemplates.style.maplibreDarkStyleUrlEnv, 'NEXT_PUBLIC_MAPLIBRE_STYLE_DARK_URL');
   assert.equal(mapboxProviderTemplates.style.publicTokenEnv, 'NEXT_PUBLIC_MAPBOX_TOKEN');
   assert.equal(googleProviderTemplates.places.placesKeyEnv, 'GOOGLE_PLACES_API_KEY');
   assert.equal(
@@ -385,6 +442,8 @@ test('env example documents startup and provider keys', async () => {
   const envExample = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
   for (const key of [
     'MAPS_DEFAULT_PROVIDER',
+    'NEXT_PUBLIC_MAPLIBRE_STYLE_URL',
+    'NEXT_PUBLIC_MAPLIBRE_STYLE_DARK_URL',
     'NEXT_PUBLIC_MAPBOX_TOKEN',
     'GOOGLE_MAPS_API_KEY',
     'APPLE_MAPKIT_TEAM_ID',

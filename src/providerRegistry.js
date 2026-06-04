@@ -18,12 +18,13 @@ export const mapsProviderRegistry = freeze({
     defaultMode: 'default-free',
     optionalEnv: [
       'NEXT_PUBLIC_MAPLIBRE_STYLE_URL',
+      'NEXT_PUBLIC_MAPLIBRE_STYLE_DARK_URL',
       'OSM_OVERPASS_ENDPOINT',
       'OVERTURE_PLACES_PATH',
       'OVERTURE_BUILDINGS_PATH',
       'PMTILES_BASE_URL',
     ],
-    publicEnv: ['NEXT_PUBLIC_MAPLIBRE_STYLE_URL'],
+    publicEnv: ['NEXT_PUBLIC_MAPLIBRE_STYLE_URL', 'NEXT_PUBLIC_MAPLIBRE_STYLE_DARK_URL'],
     capabilities: [
       'render-raster-or-vector-style',
       'query-osm-overpass',
