@@ -17,7 +17,7 @@
 let tst = null;
 for (const spec of ['@ric/tst', '../../TST/src/index.js']) {
   try {
-    // eslint-disable-next-line no-await-in-loop
+     
     tst = await import(spec);
     break;
   } catch {

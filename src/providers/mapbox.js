@@ -1,12 +1,12 @@
 import { createMapsProviderAdapter } from '../providerAdapter.js';
 import { getMapsProvider } from '../providerRegistry.js';
 export {
+  buildMapboxLayerTemplate,
+  buildMapboxRuntimeConfig,
   MAPBOX_BRAND_COLORS,
   MAPBOX_HEATMAP_RAMP,
   MAPBOX_LAYER_IDS,
   MAPBOX_PIN_COLORS,
-  buildMapboxLayerTemplate,
-  buildMapboxRuntimeConfig,
   resolveMapsPinColor,
   resolveMapsPinRadius,
 } from './mapboxRuntime.js';

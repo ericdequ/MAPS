@@ -3,16 +3,16 @@
 // shapes, and that the resolved bridge exports work either way (TST present:
 // enhanced; absent: fallback).
 
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 import {
   __local,
-  defineProviderType,
   buildProviderRef,
+  defineProviderType,
   normalizeProviderId,
-  resolveEmojiType,
   PROVIDER_TYPE_SCHEMA_VERSION,
+  resolveEmojiType,
 } from '../src/tstBridge.js';
 
 test('standalone fallback: defineProviderType emits the canonical type shape', () => {

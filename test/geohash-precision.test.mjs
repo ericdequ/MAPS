@@ -1,10 +1,10 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
 import {
-  GEOHASH_PRECISION,
   GEOHASH_MAX_PRECISION,
   GEOHASH_MIN_PRECISION,
+  GEOHASH_PRECISION,
   GEOHASH_PRECISION_INFO,
   geohashPrecisionInfo,
   precisionForRadiusMeters,

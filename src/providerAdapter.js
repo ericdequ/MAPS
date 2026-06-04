@@ -1,9 +1,9 @@
+import { normalizeMapsPlace } from './placeSchema.js';
 import {
   evaluateProviderEnv,
   getMapsProvider,
   mapsProviderIds,
 } from './providerRegistry.js';
-import { normalizeMapsPlace } from './placeSchema.js';
 
 const freeze = (value) => Object.freeze(value);
 const cleanText = (value, fallback = '') =>
