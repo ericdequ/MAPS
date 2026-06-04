@@ -1,5 +1,28 @@
 import { createMapsProviderAdapter } from '../providerAdapter.js';
 import { getMapsProvider } from '../providerRegistry.js';
+export {
+  extractAppleMapsAddress,
+  extractAppleMapsCategories,
+  extractAppleMapsCoordinates,
+  normalizeAppleMapsPlace,
+  normalizeAppleMapsPlaceId,
+} from './applePlace.js';
+export {
+  APPLE_MAPKIT_RUNTIME_TEMPLATE,
+  appleSpanToZoom,
+  appleZoomToSpan,
+  buildAppleMapKitRuntimeTemplate,
+  getAppleClusterGlyph,
+  normalizeAppleMapKitSearchPlace,
+} from './appleRuntime.js';
+export {
+  buildAppleMapKitJwt,
+  getAppleMapKitTokenStatus,
+  getJwtExpiry,
+  isJwtExpired,
+  normalizeAppleMapsTokenOrigin,
+  parseJwtPayload,
+} from './appleToken.js';
 
 export const appleProviderManifest = getMapsProvider('apple');
 

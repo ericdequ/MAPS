@@ -2,9 +2,10 @@
 
 Reusable maps and places provider templates for RIC map products.
 
-MAPS owns provider startup shape, environment-key manifests, normalized place
-schema, and adapter templates. Product apps own UI workflows, consent prompts,
-and domain behavior.
+MAPS owns map-specific provider startup shape, environment-key manifests,
+normalized place schema, and adapter templates. Shared provider type and
+provider reference contracts come from sibling `../TST`. Product apps own UI
+workflows, consent prompts, and domain behavior.
 
 ## Package
 
@@ -22,13 +23,26 @@ import {
 
 ## Layout
 
-- `src/providerRegistry.js` - provider manifests for Libre, Mapbox, Google, and
-  Apple.
+- `src/providerRegistry.js` - TST-backed provider manifests for Libre, Mapbox,
+  Google, and Apple.
 - `src/placeSchema.js` - normalized provider-neutral place skeleton using
   `name@geohash9`.
+- `src/mapPin.js` - provider-neutral `maps-pin-v1` records for map renderers.
+- `src/geoViewport.js` - dependency-free viewport, cluster, precision, and
+  camera-bound helpers.
+- `src/runtimePolicy.js` - shared renderer budgets and mobile/low-end policy.
+- `src/visitedCoverage.js` - pure visited-geohash tracking helpers; apps own
+  persistence.
+- `src/routeLine.js` - provider-neutral route/crawl line segment and GeoJSON
+  helpers.
+- `src/providerRoutes.js` - provider comparison route normalization templates.
 - `src/providerAdapter.js` - shared adapter template for search requests,
   runtime config, and place normalization.
 - `src/startup.js` - environment-driven startup checks and provider readiness.
+- `docs/places-maps-template.md` - notes on the valuable map code lifted from
+  `stuff/` and what intentionally stayed app-specific.
+- `docs/library-feedback-loop.md` - required adoption note so consuming apps
+  upstream reusable improvements into MAPS.
 - `providers/` - provider-specific notes and env requirements.
 - `poi/` - POI pipeline and source schema notes.
 - `native/` - Swift/Kotlin/native provider boundary notes.
@@ -69,6 +83,10 @@ sports-tap@djn4k5e7u
 city-diamond@djn4k5e7u#baseball-field
 album-release@djn4k5e7u@2026-06-03#music-post
 ```
+
+MAPS provider manifests, provider refs, and normalized places expose the TST
+unicode type fields too. Provider kind glyphs come from TST provider contracts;
+place/activity glyphs come from the TST emoji type map.
 
 ## Provider Policy
 

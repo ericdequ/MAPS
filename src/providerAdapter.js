@@ -52,12 +52,20 @@ export function createMapsProviderAdapter(providerId = 'libre', env = {}) {
       normalizeMapsPlace({
         ...place,
         provider: provider.id,
+        providerKind: provider.providerKind,
+        attribution: provider.attribution,
+        unicodeType: place.unicodeType || place.emoji || place.glyph,
+        unicodeTypes: place.unicodeTypes,
         sourcePolicy: provider.sourcePolicy,
       }),
     buildRuntimeConfig: () =>
       freeze({
         providerId: provider.id,
         mode: provider.defaultMode,
+        providerGlyph: provider.providerGlyph,
+        modeGlyph: provider.modeGlyph,
+        unicodeType: provider.unicodeType,
+        unicodeTypes: provider.unicodeTypes,
         capabilities: provider.capabilities,
         attribution: provider.attribution,
         publicEnv: Object.fromEntries(

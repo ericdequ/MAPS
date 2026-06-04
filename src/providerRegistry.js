@@ -1,41 +1,14 @@
-export const MAPS_PROVIDER_SCHEMA_VERSION = 'maps-provider-v1';
+import {
+  TST_PROVIDER_TYPE_SCHEMA_VERSION,
+  defineTstProviderType,
+  normalizeTstProviderId,
+} from '../../TST/src/providerTypes.js';
+
+export const MAPS_PROVIDER_SCHEMA_VERSION = TST_PROVIDER_TYPE_SCHEMA_VERSION;
 
 const freeze = (value) => Object.freeze(value);
-const list = (values = []) => freeze(values);
 
-const makeProvider = ({
-  id,
-  label,
-  kind,
-  defaultMode,
-  requiredEnv = [],
-  optionalEnv = [],
-  publicEnv = [],
-  capabilities = [],
-  durableStorage = 'adapter-local',
-  sourcePolicy,
-  attribution = [],
-  styleTemplates = [],
-  searchTemplates = [],
-  startupNotes = [],
-}) =>
-  freeze({
-    schemaVersion: MAPS_PROVIDER_SCHEMA_VERSION,
-    id,
-    label,
-    kind,
-    defaultMode,
-    requiredEnv: list(requiredEnv),
-    optionalEnv: list(optionalEnv),
-    publicEnv: list(publicEnv),
-    capabilities: list(capabilities),
-    durableStorage,
-    sourcePolicy,
-    attribution: list(attribution),
-    styleTemplates: list(styleTemplates),
-    searchTemplates: list(searchTemplates),
-    startupNotes: list(startupNotes),
-  });
+const makeProvider = (provider = {}) => defineTstProviderType(provider);
 
 export const mapsProviderRegistry = freeze({
   libre: makeProvider({
@@ -77,8 +50,19 @@ export const mapsProviderRegistry = freeze({
     kind: 'commercial-render-search',
     defaultMode: 'optional-render-provider',
     requiredEnv: ['NEXT_PUBLIC_MAPBOX_TOKEN'],
-    optionalEnv: ['MAPBOX_ACCESS_TOKEN', 'MAPBOX_STYLE_URL'],
-    publicEnv: ['NEXT_PUBLIC_MAPBOX_TOKEN'],
+    optionalEnv: [
+      'MAPBOX_ACCESS_TOKEN',
+      'MAPBOX_STYLE_URL',
+      'NEXT_PUBLIC_MAPBOX_STYLE_URL',
+      'NEXT_PUBLIC_MAPBOX_TILESET_ID',
+      'NEXT_PUBLIC_MAPBOX_SOURCE_LAYER',
+    ],
+    publicEnv: [
+      'NEXT_PUBLIC_MAPBOX_TOKEN',
+      'NEXT_PUBLIC_MAPBOX_STYLE_URL',
+      'NEXT_PUBLIC_MAPBOX_TILESET_ID',
+      'NEXT_PUBLIC_MAPBOX_SOURCE_LAYER',
+    ],
     capabilities: [
       'render-vector-style',
       'geocode',
@@ -91,7 +75,12 @@ export const mapsProviderRegistry = freeze({
     sourcePolicy:
       'Mapbox feature ids are provider-local. Store only user-created or separately licensed normalized place data.',
     attribution: ['Mapbox', 'OpenStreetMap contributors'],
-    styleTemplates: ['mapbox-style-url', 'mapbox-satellite'],
+    styleTemplates: [
+      'mapbox-style-url',
+      'mapbox-satellite',
+      'mapbox-vector-places-tileset',
+      'mapbox-nightlife-theme-template',
+    ],
     searchTemplates: ['mapbox-forward-geocode', 'mapbox-category-search'],
     startupNotes: [
       'Use public scoped token for browser rendering.',
@@ -159,7 +148,10 @@ export const mapsProviderRegistry = freeze({
 export const mapsProviderIds = freeze(Object.keys(mapsProviderRegistry));
 
 export function getMapsProvider(providerId = 'libre') {
-  return mapsProviderRegistry[providerId] || mapsProviderRegistry.libre;
+  return (
+    mapsProviderRegistry[normalizeTstProviderId(providerId, 'libre')] ||
+    mapsProviderRegistry.libre
+  );
 }
 
 export function listMapsProviders({ includeOptional = true } = {}) {

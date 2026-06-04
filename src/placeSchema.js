@@ -1,3 +1,7 @@
+import { buildTstProviderRef } from '../../TST/src/providerTypes.js';
+import { expandTstUnicodeTypes, resolveTstEmojiType } from '../../TST/src/index.js';
+import { encodeMapsGeohash } from './geohash.js';
+
 export const MAPS_PLACE_SCHEMA_VERSION = 'maps-place-v1';
 export const MAPS_POI_SOURCE_SCHEMA_VERSION = 'maps-poi-source-v1';
 export const MAPS_TST_CONTRACT = 'name@geohash9[@time][#type]';
@@ -60,6 +64,10 @@ export function normalizeMapsPlace(input = {}) {
   const geohash = normalizeMapsGeohash(
     input.geohash || input.geohash9 || input.g9 || input.publicGeohash,
     9
+  ) || encodeMapsGeohash(
+    input.lat ?? input.latitude,
+    input.lng ?? input.lon ?? input.longitude,
+    9
   );
   const canonicalKey = buildMapsPlaceKey({
     name,
@@ -85,6 +93,30 @@ export function normalizeMapsPlace(input = {}) {
         .filter(Boolean)
     ),
   ];
+  const unicodeTypes = expandTstUnicodeTypes([
+    placeType,
+    ...typeTokens,
+    ...(input.unicodeTypes || []),
+    input.unicodeType,
+    input.unicodeGlyph,
+    input.emoji,
+    input.glyph,
+  ]);
+  const resolvedEmojiType =
+    resolveTstEmojiType(input.unicodeType) ||
+    resolveTstEmojiType(input.emoji) ||
+    resolveTstEmojiType(placeType) ||
+    typeTokens.map((token) => resolveTstEmojiType(token)).find(Boolean);
+  const providerRef = buildTstProviderRef({
+    providerId: provider,
+    providerKind: input.providerKind || input.kind || 'maps-place-provider',
+    sourceId,
+    sourcePolicy:
+      input.sourcePolicy ||
+      'Provider ids stay adapter-local; canonical app ids use name@geohash9.',
+    attribution: input.attribution || [],
+    durable: input.durableProviderRecord || false,
+  });
 
   return freeze({
     schemaVersion: MAPS_PLACE_SCHEMA_VERSION,
@@ -94,6 +126,9 @@ export function normalizeMapsPlace(input = {}) {
     tstContract: MAPS_TST_CONTRACT,
     name,
     provider,
+    providerRef,
+    unicodeType: resolvedEmojiType?.glyph || unicodeTypes[0] || '',
+    unicodeTypes: freeze(unicodeTypes),
     sourceId,
     sourceIds: freeze({
       [provider]: sourceId,
