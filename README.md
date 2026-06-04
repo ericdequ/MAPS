@@ -3,9 +3,16 @@
 Reusable maps and places provider templates for RIC map products.
 
 MAPS owns map-specific provider startup shape, environment-key manifests,
-normalized place schema, and adapter templates. Shared provider type and
-provider reference contracts come from sibling `../TST`. Product apps own UI
-workflows, consent prompts, and domain behavior.
+normalized place schema, and adapter templates. Product apps own UI workflows,
+consent prompts, and domain behavior.
+
+**Standalone, enhanced by TST.** MAPS works on its own with a self-contained
+copy of the provider-type / provider-ref contract. When TST is available — the
+installed `@ric/tst` package, or a sibling `../../TST` repo in the eco layout —
+`src/tstBridge.js` transparently uses TST's canonical contracts + emoji-type
+resolver instead, so shapes stay consistent across the ecosystem. Without TST,
+the optional emoji-type enrichment simply degrades to none. No hard dependency
+on a sibling's source path.
 
 ## Package
 

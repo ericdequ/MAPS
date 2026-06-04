@@ -1,6 +1,9 @@
-import { buildTstProviderRef } from '../../TST/src/providerTypes.js';
-import { expandTstUnicodeTypes, resolveTstEmojiType } from '../../TST/src/index.js';
 import { encodeMapsGeohash } from './geohash.js';
+import {
+  buildProviderRef,
+  expandUnicodeTypes,
+  resolveEmojiType,
+} from './tstBridge.js';
 
 export const MAPS_PLACE_SCHEMA_VERSION = 'maps-place-v1';
 export const MAPS_POI_SOURCE_SCHEMA_VERSION = 'maps-poi-source-v1';
@@ -93,7 +96,7 @@ export function normalizeMapsPlace(input = {}) {
         .filter(Boolean)
     ),
   ];
-  const unicodeTypes = expandTstUnicodeTypes([
+  const unicodeTypes = expandUnicodeTypes([
     placeType,
     ...typeTokens,
     ...(input.unicodeTypes || []),
@@ -103,11 +106,11 @@ export function normalizeMapsPlace(input = {}) {
     input.glyph,
   ]);
   const resolvedEmojiType =
-    resolveTstEmojiType(input.unicodeType) ||
-    resolveTstEmojiType(input.emoji) ||
-    resolveTstEmojiType(placeType) ||
-    typeTokens.map((token) => resolveTstEmojiType(token)).find(Boolean);
-  const providerRef = buildTstProviderRef({
+    resolveEmojiType(input.unicodeType) ||
+    resolveEmojiType(input.emoji) ||
+    resolveEmojiType(placeType) ||
+    typeTokens.map((token) => resolveEmojiType(token)).find(Boolean);
+  const providerRef = buildProviderRef({
     providerId: provider,
     providerKind: input.providerKind || input.kind || 'maps-place-provider',
     sourceId,

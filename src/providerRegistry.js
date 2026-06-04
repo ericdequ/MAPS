@@ -1,14 +1,14 @@
 import {
-  TST_PROVIDER_TYPE_SCHEMA_VERSION,
-  defineTstProviderType,
-  normalizeTstProviderId,
-} from '../../TST/src/providerTypes.js';
+  defineProviderType,
+  normalizeProviderId,
+  PROVIDER_TYPE_SCHEMA_VERSION,
+} from './tstBridge.js';
 
-export const MAPS_PROVIDER_SCHEMA_VERSION = TST_PROVIDER_TYPE_SCHEMA_VERSION;
+export const MAPS_PROVIDER_SCHEMA_VERSION = PROVIDER_TYPE_SCHEMA_VERSION;
 
 const freeze = (value) => Object.freeze(value);
 
-const makeProvider = (provider = {}) => defineTstProviderType(provider);
+const makeProvider = (provider = {}) => defineProviderType(provider);
 
 export const mapsProviderRegistry = freeze({
   libre: makeProvider({
@@ -149,7 +149,7 @@ export const mapsProviderIds = freeze(Object.keys(mapsProviderRegistry));
 
 export function getMapsProvider(providerId = 'libre') {
   return (
-    mapsProviderRegistry[normalizeTstProviderId(providerId, 'libre')] ||
+    mapsProviderRegistry[normalizeProviderId(providerId, 'libre')] ||
     mapsProviderRegistry.libre
   );
 }
