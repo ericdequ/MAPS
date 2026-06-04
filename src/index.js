@@ -17,3 +17,13 @@ export * from './providers/applePlace.js';
 export * from './providers/appleRuntime.js';
 export * from './providers/appleToken.js';
 export * from './providers/mapboxRuntime.js';
+
+// Geohash precision metadata (reusable reference data).
+export {
+  GEOHASH_PRECISION,
+  GEOHASH_MAX_PRECISION,
+  GEOHASH_MIN_PRECISION,
+  GEOHASH_PRECISION_INFO,
+  geohashPrecisionInfo,
+  precisionForRadiusMeters,
+} from './geohashPrecision.js';
