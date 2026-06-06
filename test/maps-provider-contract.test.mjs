@@ -129,7 +129,10 @@ test('provider adapter normalizes provider records into MAPS place schema', () =
   assert.equal(place.canonicalKey, 'sports-tap@djn4k5e7u');
   assert.equal(place.placeId, place.canonicalKey);
   assert.ok(place.typeTokens.includes('nightlife'));
-  assert.equal(place.unicodeType, '\u{1F378}');
+  // Primary glyph follows placeType ('bar' → 🍺) per the resolver order; the
+  // nightlife vibe tag stays in the unicodeTypes set. (Was 🍸 when bar mapped to
+  // cocktail, before the TST registry corrected bar→🍺 / nightlife→🍸.)
+  assert.equal(place.unicodeType, '\u{1F37A}');
   assert.ok(place.unicodeTypes.includes('\u{1F378}'));
   assert.ok(place.sourcePolicy.includes('Google place ids'));
 });
